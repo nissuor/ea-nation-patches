@@ -8,10 +8,13 @@ executable for a private server: it removes the local administrator gate, select
 plain Aries at a configurable IPv4 address (TCP 31320), reads credentials from a
 dedicated current-user registry key, and retains the installed roster.
 
-Requires Python 3.8+ with no third-party packages. Only the following original
-`CoachFinal.exe` SHA-256 is supported (other builds are refused):
+Requires Python 3.8+ with no third-party packages. The supported input is
+`Crack/CoachFinal.exe` from `NFL-Head-Coach_NoCD_Win_EN.zip`. This executable was
+verified byte-for-byte against the source used to develop the patch (6,356,305 bytes).
+Use that EXE as the input to the command below and keep an unmodified backup.
+
+The patcher requires this SHA-256 and refuses other builds, regardless of filename:
 `72c76b161d8b42b4d86a46c604893fcffc69817438f0b8b72d2a9806ee10fe0d`.
-Its release/region has not been independently identified. Keep the original EXE.
 
 From the repository root, with the game closed:
 
@@ -45,15 +48,9 @@ Requires the `PC_COACH06` server fixes in
 with that listener enabled and SSL disabled. Both players should use matching
 installed rosters. This does not configure the server or its buddy service.
 
-Before the INI hook was added, two-PC LAN gameplay was confirmed: both clients
-reached the field and ran a few plays. One PC used this standalone patcher; the server-hosting PC used the same
-online fixes plus 1920×1080 windowed display, background processing and window-close
-fixes. Both retained standard gameplay ports and unchanged voice behavior; voice
-audio itself was not verified. A completed match and Internet play remain unverified.
-Career navigation has not been retested with the standalone build. Display changes,
-same-PC multiplayer patches, game executables and assets are not included.
-The INI hook was subsequently verified by successful login using a file address
-different from the embedded fallback; two-PC gameplay has not been rerun with it.
+LAN and direct Internet H2H gameplay have been confirmed between two PCs in our
+test setup. Display changes, same-PC multiplayer patches, game executables and
+assets are not included.
 
 ## [PSP] Xdelta patches
 
