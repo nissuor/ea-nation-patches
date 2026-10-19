@@ -1,6 +1,43 @@
 # Patches for EA Nation games
 A project dedicated to provide patches to get games to connect to a private server, as well as other features.
 
+## [PC] NFL Head Coach (experimental)
+
+[`PC/NFL Head Coach/patch.py`](PC/NFL%20Head%20Coach/patch.py) creates a separate
+executable for a private server: it removes the local administrator gate, selects
+plain Aries at the supplied IPv4 address (TCP 31320), reads credentials from a
+dedicated current-user registry key, and retains the installed roster.
+
+Requires Python 3.8+ with no third-party packages. Only the following original
+`CoachFinal.exe` SHA-256 is supported (other builds are refused):
+`72c76b161d8b42b4d86a46c604893fcffc69817438f0b8b72d2a9806ee10fe0d`.
+Its release/region has not been independently identified. Keep the original EXE.
+
+From the repository root, with the game closed:
+
+```powershell
+py "PC/NFL Head Coach/patch.py" patch "C:\Games\NFL Head Coach\CoachFinal.exe" "C:\Games\NFL Head Coach\CoachOnline.exe" --server 127.0.0.1
+py "PC/NFL Head Coach/patch.py" account --username YOUR_SERVER_ACCOUNT
+```
+
+Replace the paths and server address as needed. The output must not already exist
+and should be beside the game's assets. Account setup prompts for the password;
+the account must already exist on your server. It stores the game's reversible
+password encoding under `HKCU\Software\NFLHC\LocalEA` (32-bit view); use a password
+unique to this private server. Run `CoachOnline.exe`, then choose Coach Online → Login.
+To revert, use the original EXE; the dedicated registry key can also be deleted.
+
+Requires the `PC_COACH06` server fixes in
+[ea-nation-server PR #49](https://github.com/a-blondel/ea-nation-server/pull/49),
+with that listener enabled and SSL disabled. Both players should use matching
+installed rosters. This does not configure the server or its buddy service.
+
+The online changes were exercised in two-client gameplay on one PC with additional
+display, instance, UDP-port, voice and background patches. This standalone subset
+has been checked against those patch bytes, but has not had a separate gameplay
+test. Separate-PC play and a completed match remain unverified. Display changes,
+same-PC multiplayer patches, game executables and assets are not included.
+
 ## [PSP] Xdelta patches
 
 ### Available patches
