@@ -5,7 +5,7 @@ A project dedicated to provide patches to get games to connect to a private serv
 
 [`PC/NFL Head Coach/patch.py`](PC/NFL%20Head%20Coach/patch.py) creates a separate
 executable for a private server: it removes the local administrator gate, selects
-plain Aries at the supplied IPv4 address (TCP 31320), reads credentials from a
+plain Aries at a configurable IPv4 address (TCP 31320), reads credentials from a
 dedicated current-user registry key, and retains the installed roster.
 
 Requires Python 3.8+ with no third-party packages. Only the following original
@@ -20,8 +20,21 @@ py "PC/NFL Head Coach/patch.py" patch "C:\Games\NFL Head Coach\CoachFinal.exe" "
 py "PC/NFL Head Coach/patch.py" account --username YOUR_SERVER_ACCOUNT
 ```
 
-Replace the paths and server address as needed. The output must not already exist
-and should be beside the game's assets. Account setup prompts for the password;
+Replace the paths as needed. The output must not already exist
+and should be beside the game's assets. Copy the supplied `coach-online.ini` beside
+the patched EXE and set its server address:
+
+```ini
+[Online]
+Host=192.168.1.201
+```
+
+After patching once, edit this file and restart the game to change servers; no
+repatch is needed. The file is located relative to the EXE, not the working
+directory. A missing file/key, empty or invalid IPv4 address falls back to
+`--server` (default `127.0.0.1`). TCP port 31320 is unchanged.
+
+Account setup prompts for the password;
 the account must already exist on your server. It stores the game's reversible
 password encoding under `HKCU\Software\NFLHC\LocalEA` (32-bit view); use a password
 unique to this private server. Run `CoachOnline.exe`, then choose Coach Online → Login.
@@ -32,13 +45,15 @@ Requires the `PC_COACH06` server fixes in
 with that listener enabled and SSL disabled. Both players should use matching
 installed rosters. This does not configure the server or its buddy service.
 
-Two-PC LAN gameplay is confirmed: both clients reached the field and ran a few
-plays. One PC used this standalone patcher; the server-hosting PC used the same
+Before the INI hook was added, two-PC LAN gameplay was confirmed: both clients
+reached the field and ran a few plays. One PC used this standalone patcher; the server-hosting PC used the same
 online fixes plus 1920×1080 windowed display, background processing and window-close
 fixes. Both retained standard gameplay ports and unchanged voice behavior; voice
 audio itself was not verified. A completed match and Internet play remain unverified.
 Career navigation has not been retested with the standalone build. Display changes,
 same-PC multiplayer patches, game executables and assets are not included.
+The INI hook was subsequently verified by successful login using a file address
+different from the embedded fallback; two-PC gameplay has not been rerun with it.
 
 ## [PSP] Xdelta patches
 
