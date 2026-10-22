@@ -1,0 +1,69 @@
+Tiger Woods PGA Tour 2004 (PS2 / NTSC-U)
+======================================
+
+Supported game: SLUS-20757, CRC 64F9781E.
+Requires your own game image, BIOS and PCSX2 installation.
+Other regions, revisions and physical-console cheat engines are untested.
+
+Files
+-----
+PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach contains six
+server-independent writes: DNAS bypass, leaderboard date fixes and the joining
+player's Internet address fallback fix. It does not redirect the lobby by itself.
+
+For a working private-server configuration, use the dependency-free Python 3
+generator from the repository root:
+
+  python tools/tw04_patch.py <server-ipv4> --out SLUS-20757_64F9781E.pnach
+
+Replace <server-ipv4> with the operator's reachable numeric IPv4 address.
+The default lobby TCP port is 10200; use --port to override it. The generated
+file contains all six fixes plus both IP/port redirects: 18 active writes.
+No personal server address is included in the repository.
+
+Installation
+------------
+1. Copy the generated file into PCSX2's configured cheats folder, replacing the
+   old TW04 file. Do not enable duplicate copies of the patches.
+2. Enable cheats for TW04. Fully shut down and boot the game; do not resume a
+   save state. The emulator log should report 18 active writes.
+3. Enable Ethernet using Sockets, an active adapter and DHCP interception.
+   Use the working PS2 network configuration with automatic IP/DNS.
+4. Sign into the operator's EA Nation server with your own account/persona.
+
+Experimental relay co-host
+--------------------------
+For PCSX2 running on the same machine as the compatible EA Nation UDP relay:
+
+  python tools/tw04_patch.py <server-lan-ipv4> --relay-client --out SLUS-20757_64F9781E.pnach
+
+This adds one instruction change (19 writes total). It makes the hosting
+connection helper use the complete ADDR supplied by the server, rather than
+append :3658 twice. The tested server supplies ip:3659:3658, so PCSX2 binds
+local UDP 3659 and sends to the relay's UDP 3658.
+
+The server-PC player must issue the challenge; the remote guest accepts and
+uses the ordinary 18-write public-IP patch. Do not give the co-host patch to
+the guest or use it with a server that does not supply a complete ADDR.
+The server operator configures relay UDP forwarding/firewall access; guests
+need outbound UDP and replies. This setup is not a general solution for two
+unreachable remote hosts, shared public IPs, or networks blocking UDP.
+
+Server implementation and configuration:
+https://github.com/nissuor/ea-nation-server/tree/codex/tw04-online-parity
+See docs/TW04.txt and docs/TW04-RELAY.txt there. Relay support is experimental
+and disabled by default. A client patch does not implement the server itself.
+
+Validation and limits
+---------------------
+On 2026-10-19, a co-located host and remote guest completed an Internet Match
+Play match, followed by an 18-hole Stroke Play match using a fresh challenge.
+Both submitted results, the server counted each match once and released the
+relay sessions. Offline execution of the original guest branch confirmed the
+address fallback correction; the IOP parser's local/remote port order was also
+checked. This does not establish compatibility with every NAT or PCSX2 backend.
+
+The daily tournament course/scorecard mismatch reported during testing remains
+a server-side investigation. These patches do not claim to fix that issue.
+No game executable, BIOS, disc image, account data or captures are distributed.
+Reference research and applicable MIT license: THIRD-PARTY-TW04.txt.

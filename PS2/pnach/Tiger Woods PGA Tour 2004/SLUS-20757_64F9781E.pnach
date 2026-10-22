@@ -1,0 +1,18 @@
+gametitle=Tiger Woods PGA Tour 2004 (USA)
+comment=DNAS bypass, leaderboard dates and Internet guest address fix
+// SLUS-20757 / CRC 64F9781E. Memory only; ISO unchanged.
+// This file does not redirect the lobby. Generate a complete server-specific
+// replacement with tools/tw04_patch.py; see doc/TW04.txt.
+// Reference research: jeddyhhh/TW04OnlineServer (MIT); THIRD-PARTY-TW04.txt.
+
+// Bypass retired DNAS authentication.
+patch=1,EE,002E1468,word,00001821
+
+// Extend both leaderboard date clamps beyond 2025.
+patch=1,EE,002BCAEC,word,28637FFF
+patch=1,EE,002BCAF8,word,24027FFE
+patch=1,EE,002BCD44,word,28637FFF
+patch=1,EE,002BCD50,word,24027FFE
+
+// If LAN discovery fails, the joining player uses server ADDR, not opponent name.
+patch=1,EE,0028B5F0,word,26240040

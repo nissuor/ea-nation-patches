@@ -20,6 +20,7 @@ A project dedicated to provide patches to get games to connect to a private serv
 ### Available patches
 - **DNAS bypass** : all patches are made to bypass DNAS checks
   - Check either the `PS2/OPL`, `PS2/pnach` or `PS2/Xdelta` folder for your game.
+- **[Tiger Woods PGA Tour 2004 (USA)](doc/TW04.txt)**: PCSX2 DNAS bypass, leaderboard date fixes, Internet guest address fix, and a configurable private-server patch generator. Optional support for the experimental EA Nation relay co-host setup.
 
 ### Usage
 
