@@ -31,9 +31,23 @@ Installation
    Use the working PS2 network configuration with automatic IP/DNS.
 4. Sign into the operator's EA Nation server with your own account/persona.
 
+Playing without port forwarding
+-------------------------------
+Stock TW04 plays peer-to-peer over UDP 3658 and has no NAT traversal of its
+own, so without help the match host must be reachable (a port forward). When
+the operator enables the EA Nation UDP relay, players need nothing beyond the
+normal 18-write patch above: both consoles already send first to the address
+the server gives them (the host's listener pokes it every second, the guest
+sends its connection request), so each opens its own NAT mapping and the relay
+forwards between them. Only the operator forwards UDP 3658. Players behind one
+public IP are supported. The 0x0028B5F0 guest fix is required; older 17-write
+patches lack it. Live validation between two remote players is pending; see
+docs/TW04-RELAY.txt in the server repository.
+
 Experimental relay co-host
 --------------------------
-For PCSX2 running on the same machine as the compatible EA Nation UDP relay:
+Only for a player whose PCSX2 runs on the relay machine itself, which cannot
+bind UDP 3658 while the relay holds it:
 
   python tools/tw04_patch.py <server-lan-ipv4> --relay-client --out SLUS-20757_64F9781E.pnach
 
@@ -44,10 +58,8 @@ local UDP 3659 and sends to the relay's UDP 3658.
 
 The server-PC player must issue the challenge; the remote guest accepts and
 uses the ordinary 18-write public-IP patch. Do not give the co-host patch to
-the guest or use it with a server that does not supply a complete ADDR.
-The server operator configures relay UDP forwarding/firewall access; guests
-need outbound UDP and replies. This setup is not a general solution for two
-unreachable remote hosts, shared public IPs, or networks blocking UDP.
+anyone else or use it with a server that does not supply a complete ADDR.
+Networks that block outbound UDP still cannot play.
 
 Server implementation and configuration:
 https://github.com/nissuor/ea-nation-server/tree/codex/tw04-online-parity
