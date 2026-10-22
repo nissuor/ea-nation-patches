@@ -10,7 +10,11 @@ import struct
 
 
 def build(ip, port=10200, relay_client=False):
-    ip = str(ipaddress.IPv4Address(ip))
+    try:
+        ip = str(ipaddress.IPv4Address(ip))
+    except ValueError:
+        # The lobby address is parsed as digits only (0x002B5BC8); no DNS lookup.
+        raise ValueError("%r is not a numeric IPv4 address; TW04 cannot use a hostname" % ip)
     if not 1 <= port <= 65535:
         raise ValueError("Port must be 1..65535")
     lines = ["gametitle=Tiger Woods PGA Tour 2004 (USA)",
@@ -51,5 +55,9 @@ if __name__ == '__main__':
     parser.add_argument('--out', type=pathlib.Path,
                         default=pathlib.Path('SLUS-20757_64F9781E.pnach'))
     args = parser.parse_args()
-    args.out.write_text(build(args.ipv4, args.port, args.relay_client), encoding='ascii')
+    try:
+        text = build(args.ipv4, args.port, args.relay_client)
+    except ValueError as e:
+        parser.error(str(e))
+    args.out.write_text(text, encoding='ascii')
     print('Wrote', args.out)

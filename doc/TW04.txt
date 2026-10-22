@@ -21,15 +21,31 @@ The default lobby TCP port is 10200; use --port to override it. The generated
 file contains all six fixes plus both IP/port redirects: 18 active writes.
 No personal server address is included in the repository.
 
+Why TW04 needs an address in the patch
+--------------------------------------
+The other EA Nation games here look up an ea.com hostname, so a DNS server or
+hosts file sends them to a private server and their patches stay
+server-independent. TW04 cannot be redirected that way: it dials the numeric
+IPv4 built into the executable (159.153.229.231:10200 at 0x0030FAC0 and
+0x00311040). The lobby setter at 0x00274B20 converts the string with
+SocketInTextGetAddr (0x002B5BC8), which parses digits only and never resolves a
+name; a hostname becomes address 0 and the lobby connection fails. The only
+names TW04 resolves are www.ea.com (a connectivity check) and the DNAS host.
+The generator therefore writes the server's own address, and refuses
+hostnames.
+
 Installation
 ------------
 1. Copy the generated file into PCSX2's configured cheats folder, replacing the
    old TW04 file. Do not enable duplicate copies of the patches.
 2. Enable cheats for TW04. Fully shut down and boot the game; do not resume a
    save state. The emulator log should report 18 active writes.
-3. Enable Ethernet using Sockets, an active adapter and DHCP interception.
-   Use the working PS2 network configuration with automatic IP/DNS.
-4. Sign into the operator's EA Nation server with your own account/persona.
+3. In the game's network settings: enable the network adapter, Ethernet device
+   type Sockets, Ethernet device Auto, Intercept DHCP on (subnet mask and
+   gateway Auto), DNS1 and DNS2 Internal.
+4. Choose ONLINE. On first use, save the default PS2 network configuration to
+   the memory card when the game offers. The DNAS screen takes about 20 seconds.
+5. Sign into the operator's EA Nation server with your own account/persona.
 
 Playing without port forwarding
 -------------------------------
@@ -73,7 +89,10 @@ Play match, followed by an 18-hole Stroke Play match using a fresh challenge.
 Both submitted results, the server counted each match once and released the
 relay sessions. Offline execution of the original guest branch confirmed the
 address fallback correction; the IOP parser's local/remote port order was also
-checked. This does not establish compatibility with every NAT or PCSX2 backend.
+checked. On 2026-10-22, PCSX2 2.8 on Linux with a generated 18-write patch
+and the network settings above logged into a public EA Nation server (PostgreSQL,
+relay enabled), selected a persona and entered the lobby. This does not
+establish compatibility with every NAT or PCSX2 backend.
 
 The daily tournament course/scorecard mismatch reported during testing remains
 a server-side investigation. These patches do not claim to fix that issue.
