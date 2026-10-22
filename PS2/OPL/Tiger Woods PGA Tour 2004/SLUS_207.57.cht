@@ -1,0 +1,18 @@
+"Tiger Woods PGA Tour 2004 /ID SLUS_207.57"
+// DNAS bypass, leaderboard dates and Internet guest address fix
+// SLUS-20757. OPL PS2RD cheat engine; memory only, ISO unchanged.
+// This file does not redirect the lobby. Generate a complete server-specific
+// replacement with tools/tw04_patch.py --opl; see doc/TW04.txt.
+// Reference research: jeddyhhh/TW04OnlineServer (MIT); THIRD-PARTY-TW04.txt.
+Mastercode
+// Hook: the pad update's call to scePadRead.
+9020CFC8 0C044D54
+// Bypass retired DNAS authentication.
+202E1468 00001821
+// Extend both leaderboard date clamps beyond 2025.
+202BCAEC 28637FFF
+202BCAF8 24027FFE
+202BCD44 28637FFF
+202BCD50 24027FFE
+// If LAN discovery fails, the joining player uses server ADDR, not opponent name.
+2028B5F0 26240040

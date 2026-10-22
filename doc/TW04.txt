@@ -2,14 +2,17 @@ Tiger Woods PGA Tour 2004 (PS2 / NTSC-U)
 ======================================
 
 Supported game: SLUS-20757, CRC 64F9781E.
-Requires your own game image, BIOS and PCSX2 installation.
-Other regions, revisions and physical-console cheat engines are untested.
+Requires your own game image and either PCSX2 (with your BIOS) or a PS2 running
+Open PS2 Loader. Other regions and revisions are unsupported; OPL on real
+hardware is untested (see below).
 
 Files
 -----
 PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach contains six
 server-independent writes: DNAS bypass, leaderboard date fixes and the joining
 player's Internet address fallback fix. It does not redirect the lobby by itself.
+PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht holds the same six writes for
+Open PS2 Loader.
 
 For a working private-server configuration, use the dependency-free Python 3
 generator from the repository root:
@@ -19,6 +22,10 @@ generator from the repository root:
 Replace <server-ipv4> with the operator's reachable numeric IPv4 address.
 The default lobby TCP port is 10200; use --port to override it. The generated
 file contains all six fixes plus both IP/port redirects: 18 active writes.
+Add --opl to write the same 18 writes as an OPL cheat file instead:
+
+  python tools/tw04_patch.py <server-ipv4> --opl --out SLUS_207.57.cht
+
 No personal server address is included in the repository.
 
 Why TW04 needs an address in the patch
@@ -46,6 +53,29 @@ Installation
 4. Choose ONLINE. On first use, save the default PS2 network configuration to
    the memory card when the game offers. The DNAS screen takes about 20 seconds.
 5. Sign into the operator's EA Nation server with your own account/persona.
+
+Open PS2 Loader (real PS2)
+--------------------------
+Requires an OPL build with the PS2RD cheat engine and a network adapter (or a
+slim PS2's built-in port). OPL has no per-game address substitution, so use the
+generated server-specific file, not the six-write file, to go online.
+1. Copy the generated SLUS_207.57.cht into the CHT folder on the device that
+   holds the game (OPL opens <device>/CHT/SLUS_207.57.cht), replacing any
+   other TW04 cheat file.
+2. In TW04's game settings, open Cheat Settings, turn the PS2RD Cheat Engine
+   on (globally or for this game) and save. Either cheat mode works.
+3. Load the game from internal HDD or USB. SMB mode is untested: OPL then
+   drives the network adapter itself while the game also needs it.
+4. In the game, choose ONLINE and create or select a network configuration
+   (DHCP from your router works for most home networks; no port forwarding).
+
+All 18 writes sit under one "Mastercode" entry so they stay enabled in OPL's
+select mode as well as its auto mode. The hook is the game's per-frame call to
+scePadRead (jal 0x00113550 at 0x0020CFC8), which also runs on the DNAS and
+lobby screens; OPL installs it only if that opcode matches, so a different
+revision gets no writes. The file was checked against a port of OPL's parser
+and hook installer and the SLUS-20757 executable, but has not yet been tried on
+a console. --relay-client is PCSX2-only and is refused with --opl.
 
 Playing without port forwarding
 -------------------------------
