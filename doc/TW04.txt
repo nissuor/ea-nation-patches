@@ -1,135 +1,65 @@
 Tiger Woods PGA Tour 2004 (PS2 / NTSC-U)
 ======================================
 
-Supported game: SLUS-20757, CRC 64F9781E.
-Requires your own game image and either PCSX2 (with your BIOS) or a PS2 running
-Open PS2 Loader. Other regions and revisions are unsupported; OPL on real
-hardware is untested (see below).
+Supported game: SLUS-20757, CRC 64F9781E, in PCSX2 or on a PS2 running Open PS2
+Loader. Other regions and revisions are unsupported.
 
 Files
 -----
-PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach contains the
-server-independent patches, like the other games' files: DNAS bypass,
-Leaderboard dates and Internet guest address (six writes). It does not redirect
-the lobby by itself. PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht holds the
-same patches for Open PS2 Loader. Both are written by the generator with
---generic (add --opl for the OPL file).
+PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach and
+PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht hold the server-independent
+patches: DNAS bypass, Leaderboard dates and Internet guest address (six
+writes). They do not redirect the lobby by themselves.
 
-For a working private-server configuration, use the dependency-free Python 3
-generator from the repository root:
+To go online, generate the files for your server's address from the
+repository root (Python 3, no dependencies):
 
   python tools/tw04_patch.py <server-ipv4> --out SLUS-20757_64F9781E.pnach
-
-Replace <server-ipv4> with the operator's reachable numeric IPv4 address.
-The default lobby TCP port is 10200; use --port to override it. The generated
-file has the same patches plus a Server address patch with both IP/port
-redirects: 18 writes in all.
-Add --opl to write the same 18 writes as an OPL cheat file instead:
-
   python tools/tw04_patch.py <server-ipv4> --opl --out SLUS_207.57.cht
 
-No personal server address is included in the repository.
+They add a Server address patch for the lobby IP and port: 18 writes in all.
+The default port is 10200; use --port to change it. --generic writes the
+server-independent files above.
 
 Why TW04 needs an address in the patch
 --------------------------------------
-The other EA Nation games here look up an ea.com hostname, so a DNS server or
-hosts file sends them to a private server and their patches stay
-server-independent. TW04 cannot be redirected that way: it dials the numeric
-IPv4 built into the executable (159.153.229.231:10200 at 0x0030FAC0 and
-0x00311040). The lobby setter at 0x00274B20 converts the string with
+The other games here look up an ea.com hostname, so DNS can send them to a
+private server. TW04 dials the numeric IPv4 built into the executable
+(159.153.229.231:10200 at 0x0030FAC0 and 0x00311040) and converts it with
 SocketInTextGetAddr (0x002B5BC8), which parses digits only and never resolves a
-name; a hostname becomes address 0 and the lobby connection fails. The only
-names TW04 resolves are www.ea.com (a connectivity check) and the DNAS host.
-The generator therefore writes the server's own address, and refuses
+name. The generator therefore writes the server's own address, and refuses
 hostnames.
 
-Installation
-------------
-1. Copy the generated file into PCSX2's configured cheats folder, replacing the
-   old TW04 file. Do not enable duplicate copies of the patches.
-2. Enable cheats for TW04, then in Game Properties > Cheats tick every TW04
-   patch: Server address, DNAS bypass, Leaderboard dates and Internet guest
-   address. Fully shut down and boot the game; do not resume a save state.
-3. In the game's network settings: enable the network adapter, Ethernet device
-   type Sockets, Ethernet device Auto, Intercept DHCP on (subnet mask and
-   gateway Auto), DNS1 and DNS2 Internal.
-4. Choose ONLINE. On first use, save the default PS2 network configuration to
-   the memory card when the game offers. The DNAS screen takes about 20 seconds.
-5. Sign into the operator's EA Nation server with your own account/persona.
+PCSX2
+-----
+1. Copy the generated file into PCSX2's cheats folder, replacing any older TW04
+   file.
+2. Enable cheats, then in Game Properties > Cheats tick all four TW04 patches.
+   Shut the game down fully and boot it again; do not resume a save state.
+3. Network settings: Ethernet device type Sockets, device Auto, Intercept DHCP
+   on, DNS1 and DNS2 Internal.
+4. Choose ONLINE. On first use, save the default network configuration to the
+   memory card when the game offers. The DNAS screen takes about 20 seconds.
 
-Open PS2 Loader (real PS2)
---------------------------
-Requires an OPL build with the PS2RD cheat engine and a network adapter (or a
-slim PS2's built-in port). OPL has no per-game address substitution, so use the
-generated server-specific file, not the six-write file, to go online.
-1. Copy the generated SLUS_207.57.cht into the CHT folder on the device that
-   holds the game (OPL opens <device>/CHT/SLUS_207.57.cht), replacing any
-   other TW04 cheat file.
-2. In TW04's game settings, open Cheat Settings, turn the PS2RD Cheat Engine
-   on (globally or for this game) with the Auto cheat mode, and save.
-3. Load the game from internal HDD or USB. SMB mode is untested: OPL then
-   drives the network adapter itself while the game also needs it.
-4. In the game, choose ONLINE and create or select a network configuration
-   (DHCP from your router works for most home networks; no port forwarding).
+Open PS2 Loader
+---------------
+1. Copy the generated SLUS_207.57.cht to <device>/CHT/ on the device that holds
+   the game.
+2. In TW04's game settings, turn the PS2RD Cheat Engine on with the Auto cheat
+   mode, and save.
+3. Load the game from internal HDD or USB (SMB is untested), choose ONLINE and
+   use a DHCP network configuration.
 
-As in the other games' files, OPL applies the codes in its Auto cheat mode;
-Select mode leaves them off. The hook is the game's per-frame call to
-scePadRead (jal 0x00113550 at 0x0020CFC8), which also runs on the DNAS and
-lobby screens; OPL installs it only if that opcode matches, so a different
-revision gets no writes. The file was checked against a port of OPL's parser
-and hook installer and the SLUS-20757 executable, but has not yet been tried on
-a console. --relay-client is PCSX2-only and is refused with --opl.
+The codes hook the game's per-frame scePadRead call (0x0020CFC8), which OPL
+only patches if the opcode matches, so another revision gets no writes. The OPL
+file has not been tried on a console yet.
 
-Playing without port forwarding
--------------------------------
-Stock TW04 plays peer-to-peer over UDP 3658 and has no NAT traversal of its
-own, so without help the match host must be reachable (a port forward). When
-the operator enables the EA Nation UDP relay, players need nothing beyond the
-normal 18-write patch above: both consoles already send first to the address
-the server gives them (the host's listener pokes it every second, the guest
-sends its connection request), so each opens its own NAT mapping and the relay
-forwards between them. Only the operator forwards UDP 3658. Players behind one
-public IP are supported. The 0x0028B5F0 guest fix is required; older 17-write
-patches lack it. Two remote players without port forwards have finished full
-matches through the relay; with a port forward on the host's router, matches
-dropped on hole 4. See docs/TW04-RELAY.txt in the server repository.
+Port forwarding
+---------------
+Matches are played peer-to-peer over UDP 3658, so the host needs that port
+forwarded, unless the server enables its UDP relay. With the relay, players
+need nothing beyond the 18-write patch: only the operator forwards UDP 3658.
+The Internet guest address patch is required in both cases.
 
-Experimental relay co-host
---------------------------
-Only for a player whose PCSX2 runs on the relay machine itself, which cannot
-bind UDP 3658 while the relay holds it:
-
-  python tools/tw04_patch.py <server-lan-ipv4> --relay-client --out SLUS-20757_64F9781E.pnach
-
-This adds a Relay co-host patch, one instruction (19 writes total), which must
-be ticked as well. It makes the hosting
-connection helper use the complete ADDR supplied by the server, rather than
-append :3658 twice. The tested server supplies ip:3659:3658, so PCSX2 binds
-local UDP 3659 and sends to the relay's UDP 3658.
-
-The server-PC player must issue the challenge; the remote guest accepts and
-uses the ordinary 18-write public-IP patch. Do not give the co-host patch to
-anyone else or use it with a server that does not supply a complete ADDR.
-Networks that block outbound UDP still cannot play.
-
-Server implementation and configuration:
-https://github.com/nissuor/ea-nation-server/tree/codex/tw04-online-parity
-See docs/TW04.txt and docs/TW04-RELAY.txt there. Relay support is experimental
-and disabled by default. A client patch does not implement the server itself.
-
-Validation and limits
----------------------
-On 2026-10-19, a co-located host and remote guest completed an Internet Match
-Play match, followed by an 18-hole Stroke Play match using a fresh challenge.
-Both submitted results, the server counted each match once and released the
-relay sessions. Offline execution of the original guest branch confirmed the
-address fallback correction; the IOP parser's local/remote port order was also
-checked. On 2026-10-22, PCSX2 2.8 on Linux with a generated 18-write patch
-and the network settings above logged into a public EA Nation server (PostgreSQL,
-relay enabled), selected a persona and entered the lobby. This does not
-establish compatibility with every NAT or PCSX2 backend.
-
-The daily tournament course/scorecard mismatch reported during testing remains
-a server-side investigation. These patches do not claim to fix that issue.
-No game executable, BIOS, disc image, account data or captures are distributed.
-Reference research and applicable MIT license: THIRD-PARTY-TW04.txt.
+No game executable, BIOS, disc image or account data is distributed.
+Reference research and its MIT license: THIRD-PARTY-TW04.txt.

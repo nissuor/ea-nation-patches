@@ -28,7 +28,7 @@ def addresses(ip, port):
     return writes
 
 
-def sections(ip=None, port=10200, relay_client=False):
+def sections(ip=None, port=10200):
     """(name, description, writes) for each patch, the server address first if given."""
     result = []
     if ip is not None:
@@ -45,12 +45,6 @@ def sections(ip=None, port=10200, relay_client=False):
     result.append(('Internet guest address',
                    'If LAN discovery fails, connect to the address the server sends, not the opponent name.',
                    [(0x0028B5F0, 0x26240040)]))
-    if relay_client:
-        # The _connect helper formats "%s%s%s" (ADDR + :3658 + :3658). Select its
-        # existing "%s" format instead; no injected code or scratch space.
-        # Original instruction 0x24A50FE0 verified against SLUS-20757.
-        result.append(('Relay co-host', 'PCSX2 on the relay machine only: the server sends ADDR=ip:localPort:remotePort.',
-                       [(0x0027AB68, 0x24A50FE8)]))
     return result
 
 
@@ -71,7 +65,7 @@ def cht(patches):
     return '\n'.join(lines) + '\n'
 
 
-def build(ip, port=10200, relay_client=False, opl=False):
+def build(ip, port=10200, opl=False):
     try:
         ip = str(ipaddress.IPv4Address(ip))
     except ValueError:
@@ -79,10 +73,7 @@ def build(ip, port=10200, relay_client=False, opl=False):
         raise ValueError("%r is not a numeric IPv4 address; TW04 cannot use a hostname" % ip)
     if not 1 <= port <= 65535:
         raise ValueError("Port must be 1..65535")
-    if opl and relay_client:
-        # The co-host shares the relay's own IP; that only happens with PCSX2.
-        raise ValueError("--relay-client is for PCSX2 on the relay machine, not OPL")
-    patches = sections(ip, port, relay_client)
+    patches = sections(ip, port)
     return cht(patches) if opl else pnach(patches)
 
 
@@ -90,8 +81,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('ipv4', nargs='?')
     parser.add_argument('--port', type=int, default=10200)
-    parser.add_argument('--relay-client', action='store_true',
-                        help='Co-host only: accept a full relay connection string in ADDR')
     parser.add_argument('--opl', action='store_true',
                         help='Write an Open PS2 Loader cheat file (CHT/SLUS_207.57.cht)')
     parser.add_argument('--out', type=pathlib.Path)
@@ -107,7 +96,7 @@ if __name__ == '__main__':
             patches = sections()
             text = cht(patches) if args.opl else pnach(patches)
         else:
-            text = build(args.ipv4, args.port, args.relay_client, args.opl)
+            text = build(args.ipv4, args.port, args.opl)
     except ValueError as e:
         parser.error(str(e))
     args.out.write_text(text, encoding='utf-8')
