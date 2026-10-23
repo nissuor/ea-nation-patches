@@ -8,11 +8,12 @@ hardware is untested (see below).
 
 Files
 -----
-PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach contains six
-server-independent writes: DNAS bypass, leaderboard date fixes and the joining
-player's Internet address fallback fix. It does not redirect the lobby by itself.
-PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht holds the same six writes for
-Open PS2 Loader.
+PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach contains the
+server-independent patches, like the other games' files: DNAS bypass,
+Leaderboard dates and Internet guest address (six writes). It does not redirect
+the lobby by itself. PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht holds the
+same patches for Open PS2 Loader. Both are written by the generator with
+--generic (add --opl for the OPL file).
 
 For a working private-server configuration, use the dependency-free Python 3
 generator from the repository root:
@@ -21,7 +22,8 @@ generator from the repository root:
 
 Replace <server-ipv4> with the operator's reachable numeric IPv4 address.
 The default lobby TCP port is 10200; use --port to override it. The generated
-file contains all six fixes plus both IP/port redirects: 18 active writes.
+file has the same patches plus a Server address patch with both IP/port
+redirects: 18 writes in all.
 Add --opl to write the same 18 writes as an OPL cheat file instead:
 
   python tools/tw04_patch.py <server-ipv4> --opl --out SLUS_207.57.cht
@@ -45,8 +47,9 @@ Installation
 ------------
 1. Copy the generated file into PCSX2's configured cheats folder, replacing the
    old TW04 file. Do not enable duplicate copies of the patches.
-2. Enable cheats for TW04. Fully shut down and boot the game; do not resume a
-   save state. The emulator log should report 18 active writes.
+2. Enable cheats for TW04, then in Game Properties > Cheats tick every TW04
+   patch: Server address, DNAS bypass, Leaderboard dates and Internet guest
+   address. Fully shut down and boot the game; do not resume a save state.
 3. In the game's network settings: enable the network adapter, Ethernet device
    type Sockets, Ethernet device Auto, Intercept DHCP on (subnet mask and
    gateway Auto), DNS1 and DNS2 Internal.
@@ -63,14 +66,14 @@ generated server-specific file, not the six-write file, to go online.
    holds the game (OPL opens <device>/CHT/SLUS_207.57.cht), replacing any
    other TW04 cheat file.
 2. In TW04's game settings, open Cheat Settings, turn the PS2RD Cheat Engine
-   on (globally or for this game) and save. Either cheat mode works.
+   on (globally or for this game) with the Auto cheat mode, and save.
 3. Load the game from internal HDD or USB. SMB mode is untested: OPL then
    drives the network adapter itself while the game also needs it.
 4. In the game, choose ONLINE and create or select a network configuration
    (DHCP from your router works for most home networks; no port forwarding).
 
-All 18 writes sit under one "Mastercode" entry so they stay enabled in OPL's
-select mode as well as its auto mode. The hook is the game's per-frame call to
+As in the other games' files, OPL applies the codes in its Auto cheat mode;
+Select mode leaves them off. The hook is the game's per-frame call to
 scePadRead (jal 0x00113550 at 0x0020CFC8), which also runs on the DNAS and
 lobby screens; OPL installs it only if that opcode matches, so a different
 revision gets no writes. The file was checked against a port of OPL's parser
@@ -87,8 +90,9 @@ the server gives them (the host's listener pokes it every second, the guest
 sends its connection request), so each opens its own NAT mapping and the relay
 forwards between them. Only the operator forwards UDP 3658. Players behind one
 public IP are supported. The 0x0028B5F0 guest fix is required; older 17-write
-patches lack it. Live validation between two remote players is pending; see
-docs/TW04-RELAY.txt in the server repository.
+patches lack it. Two remote players without port forwards have finished full
+matches through the relay; with a port forward on the host's router, matches
+dropped on hole 4. See docs/TW04-RELAY.txt in the server repository.
 
 Experimental relay co-host
 --------------------------
@@ -97,7 +101,8 @@ bind UDP 3658 while the relay holds it:
 
   python tools/tw04_patch.py <server-lan-ipv4> --relay-client --out SLUS-20757_64F9781E.pnach
 
-This adds one instruction change (19 writes total). It makes the hosting
+This adds a Relay co-host patch, one instruction (19 writes total), which must
+be ticked as well. It makes the hosting
 connection helper use the complete ADDR supplied by the server, rather than
 append :3658 twice. The tested server supplies ip:3659:3658, so PCSX2 binds
 local UDP 3659 and sends to the relay's UDP 3658.
