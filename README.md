@@ -20,6 +20,8 @@ A project dedicated to provide patches to get games to connect to a private serv
 ### Available patches
 - **DNAS bypass** : all patches are made to bypass DNAS checks
   - Check either the `PS2/OPL`, `PS2/pnach` or `PS2/Xdelta` folder for your game.
+- **Private Server**
+  - **Tiger Woods PGA Tour 2004** : the game connects to a fixed IP address instead of a hostname, so its `PS2/OPL` and `PS2/pnach` files only bypass DNAS and fix the leaderboard dates and the Internet guest address. Generate the files for your server's address with `tools/tw04_patch.py` (see [doc/TW04.txt](doc/TW04.txt)).
 
 ### Usage
 

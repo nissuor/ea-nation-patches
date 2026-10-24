@@ -1,0 +1,12 @@
+"TIGERWOODS04 /ID SLUS_207.57"
+//Online patches — Main Game
+9020CFC8 0C044D54
+//DNAS bypass: Skip the retired DNAS authentication check.
+202E1468 00001821
+//Leaderboard dates: Extend both leaderboard date clamps beyond 2025.
+202BCAEC 28637FFF
+202BCAF8 24027FFE
+202BCD44 28637FFF
+202BCD50 24027FFE
+//Internet guest address: If LAN discovery fails, connect to the address the server sends, not the opponent name.
+2028B5F0 26240040

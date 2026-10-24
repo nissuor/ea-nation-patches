@@ -1,0 +1,65 @@
+Tiger Woods PGA Tour 2004 (PS2 / NTSC-U)
+======================================
+
+Supported game: SLUS-20757, CRC 64F9781E, in PCSX2 or on a PS2 running Open PS2
+Loader. Other regions and revisions are unsupported.
+
+Files
+-----
+PS2/pnach/Tiger Woods PGA Tour 2004/SLUS-20757_64F9781E.pnach and
+PS2/OPL/Tiger Woods PGA Tour 2004/SLUS_207.57.cht hold the server-independent
+patches: DNAS bypass, Leaderboard dates and Internet guest address (six
+writes). They do not redirect the lobby by themselves.
+
+To go online, generate the files for your server's address from the
+repository root (Python 3, no dependencies):
+
+  python tools/tw04_patch.py <server-ipv4> --out SLUS-20757_64F9781E.pnach
+  python tools/tw04_patch.py <server-ipv4> --opl --out SLUS_207.57.cht
+
+They add a Server address patch for the lobby IP and port: 18 writes in all.
+The default port is 10200; use --port to change it. --generic writes the
+server-independent files above.
+
+Why TW04 needs an address in the patch
+--------------------------------------
+The other games here look up an ea.com hostname, so DNS can send them to a
+private server. TW04 dials the numeric IPv4 built into the executable
+(159.153.229.231:10200 at 0x0030FAC0 and 0x00311040) and converts it with
+SocketInTextGetAddr (0x002B5BC8), which parses digits only and never resolves a
+name. The generator therefore writes the server's own address, and refuses
+hostnames.
+
+PCSX2
+-----
+1. Copy the generated file into PCSX2's cheats folder, replacing any older TW04
+   file.
+2. Enable cheats, then in Game Properties > Cheats tick all four TW04 patches.
+   Shut the game down fully and boot it again; do not resume a save state.
+3. Network settings: Ethernet device type Sockets, device Auto, Intercept DHCP
+   on, DNS1 and DNS2 Internal.
+4. Choose ONLINE. On first use, save the default network configuration to the
+   memory card when the game offers. The DNAS screen takes about 20 seconds.
+
+Open PS2 Loader
+---------------
+1. Copy the generated SLUS_207.57.cht to <device>/CHT/ on the device that holds
+   the game.
+2. In TW04's game settings, turn the PS2RD Cheat Engine on with the Auto cheat
+   mode, and save.
+3. Load the game from internal HDD or USB (SMB is untested), choose ONLINE and
+   use a DHCP network configuration.
+
+The codes hook the game's per-frame scePadRead call (0x0020CFC8), which OPL
+only patches if the opcode matches, so another revision gets no writes. The OPL
+file has not been tried on a console yet.
+
+Port forwarding
+---------------
+Matches are played peer-to-peer over UDP 3658, so the host needs that port
+forwarded, unless the server enables its UDP relay. With the relay, players
+need nothing beyond the 18-write patch: only the operator forwards UDP 3658.
+The Internet guest address patch is required in both cases.
+
+No game executable, BIOS, disc image or account data is distributed.
+Reference research and its MIT license: THIRD-PARTY-TW04.txt.
